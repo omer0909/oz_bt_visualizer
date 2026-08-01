@@ -1,0 +1,21 @@
+[package]
+name = "oz_bt_visualizer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bincode-next = { version = "3.1", features = ["serde"] }
+serde = { version = "1", features = ["derive"] }
+zmq = "0.10"
+eframe = "0.35"
+egui_extras = { version = "0.35", features = ["default", "image"] }
+env_logger = { version = "0.11", features = ["auto-color", "humantime"] }
+chrono = { version = "0.4", features = ["serde"] }
+egui-toast = "0.21"
+egui-phosphor = "0.13"
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = "symbols"
+panic = "abort"
