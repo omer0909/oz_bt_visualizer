@@ -47,7 +47,7 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
     eframe::run_native(
-        "My egui App",
+        &format!("Behavior Tree Visualizer ({}:{})", args.host, args.port),
         options,
         Box::new(|cc| {
             let egui_ctx = cc.egui_ctx.clone();
