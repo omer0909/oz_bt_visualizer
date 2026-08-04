@@ -82,7 +82,7 @@ struct MyApp {
 impl MyApp {
     fn new(socket: zmq::Socket) -> Self {
         Self {
-            socket: socket,
+            socket,
             watching_group: Vec::new(),
             tree: WatchContent {
                 node_type: NodeTypes::Flow,
@@ -126,7 +126,7 @@ impl GroupContent {
         }
     }
 
-    fn get_group(nodes: &Vec<WatchContent>, deep: i32, parent_address: Vec<usize>) -> Vec<Self> {
+    fn get_group(nodes: &[WatchContent], deep: i32, parent_address: Vec<usize>) -> Vec<Self> {
         nodes
             .iter()
             .enumerate()
@@ -160,10 +160,10 @@ impl GroupContent {
                     vec![Self {
                         childs: Self::get_group(&node.childs, active_deep, address.clone()),
                         extra_data: ExtraData::Empty,
-                        watch_content: watch_content,
+                        watch_content,
                         width: 0.0,
                         all_width: 0.0,
-                        address: address,
+                        address,
                     }]
                 } else {
                     Self::get_group(&node.childs, active_deep, address)
@@ -181,7 +181,7 @@ impl GroupContent {
                 childs: node
                     .childs
                     .into_iter()
-                    .map(|child| Self::calculate_group_outputs(child))
+                    .map(Self::calculate_group_outputs)
                     .collect(),
                 ..base
             };
@@ -205,7 +205,7 @@ impl GroupContent {
                 .childs
                 .into_iter()
                 .flat_map(|child| child.childs)
-                .map(|child| Self::calculate_group_outputs(child))
+                .map(Self::calculate_group_outputs)
                 .collect(),
             extra_data: ExtraData::GroupNode(out_names),
             ..base
@@ -257,15 +257,15 @@ impl MyApp {
                             self.reset_view = true;
                         }
                     } else {
-                        self.node_desc_draw(ui, node, rect, color, &group_name);
+                        self.node_desc_draw(ui, node, rect, color, group_name);
                     }
                 }
 
                 NodeTypes::Event(event_name) => {
-                    self.node_desc_draw(ui, node, rect, color, &event_name);
+                    self.node_desc_draw(ui, node, rect, color, event_name);
                 }
                 NodeTypes::GroupOut(out_name) => {
-                    self.node_desc_draw(ui, node, rect, color, &out_name);
+                    self.node_desc_draw(ui, node, rect, color, out_name);
                 }
                 _ => {
                     self.basic_node_draw(ui, node, rect, color);
@@ -361,7 +361,7 @@ impl MyApp {
             f.layout_no_wrap(
                 text.to_string(),
                 egui::FontId::proportional(14.0 * self.scene_font_scale),
-                egui::Color32::WHITE,
+                egui::Color32::PLACEHOLDER,
             )
         });
 
@@ -396,9 +396,9 @@ impl MyApp {
             + 40.0;
 
         GroupContent {
-            width: width,
+            width,
             all_width: childs_width.max(width),
-            childs: childs,
+            childs,
             ..base
         }
     }
@@ -437,7 +437,7 @@ impl MyApp {
                 panic!("Gurup node içinde gurup ismi bulunamadı!");
             };
 
-            self.text(ui, &group_name, rect.center(), 14.0, tex_color);
+            self.text(ui, group_name, rect.center(), 14.0, tex_color);
 
             let ExtraData::GroupNode(out_names) = &node.extra_data else {
                 panic!("Gurup node içinde out_names bulunamadı!");
@@ -564,7 +564,7 @@ impl MyApp {
             f.layout_no_wrap(
                 out_names.join(seperator),
                 egui::FontId::proportional(14.0 * self.scene_font_scale),
-                egui::Color32::WHITE,
+                egui::Color32::PLACEHOLDER,
             )
         });
 
@@ -572,7 +572,7 @@ impl MyApp {
             .rows
             .first()
             .map(|row| row.glyphs.clone())
-            .unwrap_or(Vec::new())
+            .unwrap_or_default()
             .into_iter()
             .rev();
         let add_pos = -galley.size().x / 2.0;
@@ -596,7 +596,7 @@ impl MyApp {
         result
     }
 
-    fn take_node(&self, address: &Vec<usize>) -> Option<&WatchContent> {
+    fn take_node(&self, address: &[usize]) -> Option<&WatchContent> {
         address
             .iter()
             .try_fold(&self.tree, |node, &index| node.childs.get(index))
@@ -606,9 +606,7 @@ impl MyApp {
         let mut result = String::new();
 
         loop {
-            let Some(node) = self.take_node(&address) else {
-                return None;
-            };
+            let node = self.take_node(&address)?;
 
             if let NodeTypes::GroupIn(group_name) = &node.node_type {
                 result = format!("/{}{}", group_name, result);
@@ -661,7 +659,7 @@ impl eframe::App for MyApp {
         ui.request_repaint_after(std::time::Duration::from_secs_f32(1.0));
 
         let group = {
-            while 0 < self.watching_group.len() {
+            while !self.watching_group.is_empty() {
                 let Some(node) = self.take_node(&self.watching_group) else {
                     self.watching_group.pop();
                     continue;
@@ -689,7 +687,7 @@ impl eframe::App for MyApp {
                     self.watching_group.clone(),
                 ),
                 extra_data: ExtraData::GroupBegin,
-                watch_content: watch_content,
+                watch_content,
                 width: 0.0,
                 all_width: 0.0,
                 address: Vec::new(),
@@ -720,7 +718,7 @@ impl eframe::App for MyApp {
                         || self.reset_view;
                     if ui
                         .add_enabled(
-                            self.watching_group.len() != 0,
+                            !self.watching_group.is_empty(),
                             egui::Button::new(egui_phosphor::regular::CARET_DOUBLE_UP),
                         )
                         .on_hover_text("Back Group")
