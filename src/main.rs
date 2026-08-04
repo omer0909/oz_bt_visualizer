@@ -1,3 +1,4 @@
+use clap::Parser;
 use eframe::egui::{self};
 use eframe::egui::{Pos2, Rect, Vec2};
 use egui::Color32;
@@ -11,12 +12,31 @@ use std::os::unix::io::RawFd;
 use std::thread;
 use std::time::Duration;
 
+#[derive(Parser, Debug)]
+#[command(
+    author,
+    version,
+    about = "Behaviour Tree Canlı Görselleştirme Uygulaması",
+    long_about = None
+)]
+struct VisualizerArgs {
+    /// Bağlanılacak Behaviour Tree sunucusunun port numarası
+    #[arg(short, long, default_value_t = 5555, env = "BT_PORT")]
+    port: u16,
+
+    /// Behaviour Tree motorunun çalıştığı IP adresi (Localhost veya uzak sunucu)
+    #[arg(long, default_value = "127.0.0.1", env = "BT_HOST")]
+    host: String,
+}
+
 fn main() -> eframe::Result {
+    let args = VisualizerArgs::parse();
+
     let socket = zmq::Context::new().socket(zmq::PULL).unwrap();
     socket.set_conflate(true).expect("Zmq conflate açılamadı!");
 
     socket
-        .connect("tcp://localhost:5555")
+        .connect(&format!("tcp://{}:{}", args.host, args.port))
         .expect("Bağlanılamadı!");
 
     let raw_fd: RawFd = socket.get_fd().expect("Zmq fd alınamadı.");

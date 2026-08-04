@@ -13,6 +13,7 @@ env_logger = { version = "0.11", features = ["auto-color", "humantime"] }
 chrono = { version = "0.4", features = ["serde"] }
 egui-toast = "0.21"
 egui-phosphor = "0.13"
+clap = { version = "4.6", features = ["derive", "env"] }
 
 [profile.release]
 lto = "fat"
