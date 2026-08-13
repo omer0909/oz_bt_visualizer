@@ -110,11 +110,9 @@ Each message contains the full serialized tree state. The visualizer diffs `star
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────┐      ZeroMQ (TCP)      ┌──────────────────────┐
-│   oz_bt Engine  │  ───────────────────►  │   OZ BT Visualizer   │
-│   (PUSH socket) │   bincode-serialized   │   (PULL + egui UI)   │
-└─────────────────┘      tree state        └──────────────────────┘
+``` mermaid
+flowchart LR
+    A["oz_bt Engine<br/>(PUSH socket)"] --"ZeroMQ (TCP)<br/>bincode-serialized tree state"--> B["OZ BT Visualizer<br/>(PULL + egui UI)"]
 ```
 
 - **Networking**: `zmq` with `poll` on the socket file descriptor; a background thread triggers egui repaints as soon as new data arrives.
