@@ -7,7 +7,7 @@ A real-time, interactive Behavior Tree visualizer built with **Rust** and [**egu
 
 ---
 
-## ✨ Features
+## Features
 
 - **Real-time Streaming** — Connects via ZeroMQ (`PULL` socket) to receive live tree updates with sub-second latency.
 - **Interactive Canvas** — Pan by dragging, zoom with the scroll wheel, and click group nodes to dive into subtrees.
@@ -24,7 +24,7 @@ A real-time, interactive Behavior Tree visualizer built with **Rust** and [**egu
 
 ---
 
-## 🎬 Preview
+## Preview
 
 <p align="center">
   <img src="demo.gif" alt="OZ BT Visualizer Demo" width="800">
@@ -32,7 +32,7 @@ A real-time, interactive Behavior Tree visualizer built with **Rust** and [**egu
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -62,7 +62,7 @@ The window will open and immediately start listening for tree data on the specif
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 The visualizer can be configured via CLI arguments or environment variables.
 
@@ -80,7 +80,7 @@ BT_HOST=192.168.1.42 BT_PORT=6000 oz-bt-visualizer
 
 ---
 
-## 🖱️ Controls
+## Controls
 
 | Action | Input |
 |--------|-------|
@@ -92,7 +92,7 @@ BT_HOST=192.168.1.42 BT_PORT=6000 oz-bt-visualizer
 
 ---
 
-## 📡 Protocol
+## Protocol
 
 The visualizer consumes binary-encoded `VisualizerMessage` packets from a ZeroMQ `PULL` socket.
 
@@ -108,7 +108,7 @@ Each message contains the full serialized tree state. The visualizer diffs `star
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 ``` mermaid
 flowchart LR
@@ -121,7 +121,7 @@ flowchart LR
 
 ---
 
-## 🛠️ Development
+## Development
 
 ```bash
 # Run in debug mode with logs
@@ -137,18 +137,14 @@ The visualizer bundles a custom **NotoSans-Bold** font and the **Phosphor** icon
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! If you find a bug or have an idea for an improvement, feel free to open an issue or submit a pull request on the main [oz_bt](https://github.com/omer0909/oz_bt) repository.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License. See the main repository for details.
 
 ---
-
-<p align="center">
-  Built with 🦀 Rust + egui
-</p>
